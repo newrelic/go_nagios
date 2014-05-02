@@ -29,13 +29,13 @@ var (
 // expected for the check and the Message is the specific output string.
 type NagiosStatus struct {
 	Message string
-	Value NagiosStatusVal
+	Value   NagiosStatusVal
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
 func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
-	for _, s := range(otherStatuses) {
+	for _, s := range otherStatuses {
 		if status.Value < s.Value {
 			status.Value = s.Value
 		}
