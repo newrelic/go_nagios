@@ -14,6 +14,15 @@ const (
 	NAGIOS_UNKNOWN
 )
 
+var (
+	valMessages = []string{
+		"OK:",
+		"WARNING:",
+		"CRITICAL:",
+		"UNKNOWN:",
+	}
+)
+
 type NagiosStatus struct {
 	Message string
 	Value NagiosStatusVal
@@ -30,38 +39,22 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 }
 
 func Unknown(output string) {
-	fmt.Fprint(os.Stdout, "UNKNOWN:", output)
-	os.Exit(3)
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN})
 }
 
 func Critical(err error) {
-	fmt.Fprint(os.Stdout, "CRITICAL:", err.Error())
-	os.Exit(2)
+	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL})
 }
 
 func Warning(output string) {
-	fmt.Fprint(os.Stdout, "WARNING:", output)
-	os.Exit(1)
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING})
 }
 
 func Ok(output string) {
-	fmt.Fprint(os.Stdout, "OK:", output)
-	os.Exit(0)
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
 }
 
-func ExitWithNagiosStatus(status *NagiosStatus) {
-	switch {
-		case status.Value == NAGIOS_UNKNOWN:
-			println("UNKNOWN:", status.Message)
-			os.Exit(3)
-		case status.Value == NAGIOS_CRITICAL:
-			println("CRITICAL:", status.Message)
-			os.Exit(2)
-		case status.Value == NAGIOS_WARNING:
-			println("WARNING:", status.Message)
-			os.Exit(1)
-		case status.Value == NAGIOS_OK:
-			println("OK:", status.Message)
-			os.Exit(0)
-	}
+func ExitWithStatus(status *NagiosStatus) {
+	fmt.Fprintln(os.Stdout, valMessages[status.Value], status.Message)
+	os.Exit(int(status.Value))
 }
