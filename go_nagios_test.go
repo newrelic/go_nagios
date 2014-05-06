@@ -1,4 +1,4 @@
-package go_nagios
+package nagios
 
 import (
 	"testing"
